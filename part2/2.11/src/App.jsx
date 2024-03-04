@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import personService from './services/persons'
 
 
 const PersonForm = ({ onSubmit, newName, newNumber, handleNameChange, handleNumberChange }) => (
@@ -22,14 +23,21 @@ const Filter = ({ value, onChange }) => (
   </div>
 );
 
-
 const Person = ({ person }) => <li>{person.name} {person.number}</li>;
 
-const Persons = ({ persons }) => (
-  <ul>
-    {persons.map(person => <Person key={person.name} person={person} />)}
-  </ul>
+const Persons = ({ persons, onDelete }) => (
+  <div>
+    <ul>
+      {persons.map(person => (
+        <li key={person.name}>
+          {person.name} {person.number}
+          <button onClick={() => onDelete(person.id)}>delete</button>
+        </li>
+      ))}
+    </ul>
+  </div>
 );
+
 
 
 const App = () => {
@@ -40,25 +48,65 @@ const App = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
+    personService
+      .getAll()
       .then(response => {
         setPersons(response.data)
       })
   }, [])
 
 
+  const deletePerson = (id) => {
+    // Confirm before deleting
+    const isConfirmed = window.confirm("Do you really want to delete this person?");
+    if (isConfirmed) {
+      personService
+        .deleteName(id)
+        .then(() => {
+          setPersons(persons.filter(person => person.id !== id));
+        })
+        .catch(error => {
+          alert("An error occurred while deleting the person.");
+        });
+    }
+  };
+
   const addNote = (event) => {
     event.preventDefault();
     const nameExists = persons.some(person => person.name === newName);
+    const existingPerson = persons.find(person => person.name === newName);
     if (nameExists) {
-      alert(`${newName} is already added to the phonebook.`);
+      const isConfirmed = window.confirm("Person already exists. Replace old number?");
+      if (isConfirmed) {
+        const updatedPerson = { ...existingPerson, number: newNumber };
+
+        personService
+          .update(existingPerson.id, updatedPerson)
+          .then(response => {
+            // Replace the person in the persons array with the updated person
+            setPersons(persons.map(person => person.id !== existingPerson.id ? person : response.data));
+            setNewName('');
+            setNewNumber('');
+          })
+          .catch(error => {
+            alert(`An error occurred while updating ${existingPerson.name}'s number.`);
+            console.error(error);
+          });
+      }
       return;
     }
+    
     const nameObject = { name: newName, number: newNumber };
     setPersons(persons.concat(nameObject));
     setNewName('');
     setNewNumber('');
+
+    personService
+      .create(nameObject)
+      .then(response => {
+        setPersons(persons.concat(response.data))
+        setNewName('')
+      })
   };
 
   const handleNameChange = (event) => setNewName(event.target.value);
@@ -88,7 +136,8 @@ const App = () => {
 
       <h3>Numbers</h3>
 
-      <Persons persons={filteredPersons} />
+      <Persons persons={filteredPersons} onDelete={deletePerson} />
+
     </div>
   );
 };
