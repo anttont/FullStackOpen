@@ -73,6 +73,7 @@ const App = () => {
 
   const addNote = (event) => {
     event.preventDefault();
+    
     const nameExists = persons.some(person => person.name === newName);
     const existingPerson = persons.find(person => person.name === newName);
     if (nameExists) {
