@@ -29,7 +29,7 @@ const Persons = ({ persons, onDelete }) => (
   <div>
     <ul>
       {persons.map(person => (
-        <li key={person.name}>
+        <li className="person" key={person.name}>
           {person.name} {person.number}
           <button onClick={() => onDelete(person.id)}>delete</button>
         </li>
@@ -38,6 +38,29 @@ const Persons = ({ persons, onDelete }) => (
   </div>
 );
 
+const ErrorNotification = ({ message }) => {
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className="error">
+      {message}
+    </div>
+  )
+}
+
+const ConfirmationNotification = ({ message }) => {
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className="confirmation">
+      {message}
+    </div>
+  )
+}
 
 
 const App = () => {
@@ -46,6 +69,8 @@ const App = () => {
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [errorMessage, setErrorMessage] = useState(null)
+  const [confirmationMessage, setConfirmationMessage] = useState(null)
 
   useEffect(() => {
     personService
@@ -88,6 +113,14 @@ const App = () => {
             setPersons(persons.map(person => person.id !== existingPerson.id ? person : response.data));
             setNewName('');
             setNewNumber('');
+
+            setConfirmationMessage(
+              `Note '${newName}' was changed`
+            )
+            setTimeout(() => {
+              setConfirmationMessage(null)
+            }, 5000)
+            
           })
           .catch(error => {
             alert(`An error occurred while updating ${existingPerson.name}'s number.`);
@@ -102,6 +135,13 @@ const App = () => {
     setNewName('');
     setNewNumber('');
 
+    setConfirmationMessage(
+      `Note '${newName}' was added`
+    )
+    setTimeout(() => {
+      setConfirmationMessage(null)
+    }, 5000)
+
     personService
       .create(nameObject)
       .then(response => {
@@ -112,7 +152,6 @@ const App = () => {
 
   const handleNameChange = (event) => setNewName(event.target.value);
   const handleNumberChange = (event) => setNewNumber(event.target.value);
-
   const handleSearchChange = (event) => setSearchTerm(event.target.value.toLowerCase());
 
   const filteredPersons = searchTerm
@@ -122,7 +161,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-
+      <ConfirmationNotification message={confirmationMessage} />
+      <ErrorNotification message={errorMessage} />
       <Filter value={searchTerm} onChange={handleSearchChange} />
 
       <h3>Add a new</h3>
