@@ -78,7 +78,14 @@ const App = () => {
       .then(response => {
         setPersons(response.data)
       })
-  }, [])
+      .catch(error => {
+        console.error("Error fetching persons:", error);
+        setErrorMessage("Failed to fetch persons from the server.");
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
+      });
+  }, []);
 
 
   const deletePerson = (id) => {
@@ -132,8 +139,21 @@ const App = () => {
             
           })
           .catch(error => {
-            alert(`An error occurred while updating ${existingPerson.name}'s number.`);
-            console.error(error);
+            if (error.response && error.response.status === 404) {
+              setErrorMessage(`The person '${existingPerson.name}' was already deleted from the server.`);
+              setTimeout(() => {
+                setErrorMessage(null);
+              }, 5000);
+          
+              
+              setPersons(persons.filter(person => person.id !== existingPerson.id));
+            } else {
+              console.error(error);
+              setErrorMessage("An error occurred while updating the person's number.");
+              setTimeout(() => {
+                setErrorMessage(null);
+              }, 5000);
+            }
           });
       }
       return;
@@ -174,7 +194,7 @@ const App = () => {
       <ErrorNotification message={errorMessage} />
       <Filter value={searchTerm} onChange={handleSearchChange} />
 
-      <h3>Add a new</h3>
+      <h3>Add a new person</h3>
 
       <PersonForm 
         onSubmit={addNote}
