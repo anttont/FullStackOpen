@@ -90,9 +90,18 @@ const App = () => {
         .then(() => {
           setPersons(persons.filter(person => person.id !== id));
         })
+
         .catch(error => {
           alert("An error occurred while deleting the person.");
         });
+
+        setConfirmationMessage(
+          `Person deleted`
+        )
+        setTimeout(() => {
+          setConfirmationMessage(null)
+        }, 5000)
+
     }
   };
 
@@ -115,7 +124,7 @@ const App = () => {
             setNewNumber('');
 
             setConfirmationMessage(
-              `Note '${newName}' was changed`
+              `Person '${newName}' was changed`
             )
             setTimeout(() => {
               setConfirmationMessage(null)
@@ -136,7 +145,7 @@ const App = () => {
     setNewNumber('');
 
     setConfirmationMessage(
-      `Note '${newName}' was added`
+      `Person '${newName}' was added`
     )
     setTimeout(() => {
       setConfirmationMessage(null)
