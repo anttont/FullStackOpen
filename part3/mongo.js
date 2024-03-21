@@ -10,6 +10,7 @@ const password = process.argv[2];
 const name = process.argv[3];
 const number = process.argv[4];
 
+console.log()
 
 const url =
   `mongodb+srv://anttonitornikoski:${password}@cluster0.786v6tk.mongodb.net/peopleApp?retryWrites=true&w=majority`;

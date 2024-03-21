@@ -95,6 +95,7 @@ app.get('/api/info', (request, response) => {
     response.status(500).send('Error fetching information from the server');
   });
 });
+
 app.delete('/api/persons/:id', (request, response, next) => {
   const id = Number(request.params.id);
   Person.findByIdAndDelete(request.params.id)
@@ -112,23 +113,23 @@ const generateId = () => {
 app.post('/api/persons', (request, response, next) => {
   const body = request.body;
 
-  // Check if name or number is missing from the request body
+  
   if (!body.name || !body.number) {
     return response.status(400).json({ error: 'name or number is missing' });
   }
 
-  // Create a new person instance using the model
+  
   const person = new Person({
     name: body.name,
     number: body.number,
   });
 
-  // Save the person instance to the database
+  
   person.save()
     .then(savedPerson => {
       response.json(savedPerson);
     })
-    .catch(error => next(error)); // Pass errors to the error handling middleware
+    .catch(error => next(error)); 
 });
 
 app.put('/api/persons/:id', (req, res, next) => {
@@ -136,8 +137,9 @@ app.put('/api/persons/:id', (req, res, next) => {
   const person = {
     name: req.body.name,
     number: req.body.number,
-    // Make sure '_id' is not included here
+    
   };
+
 
   Person.findByIdAndUpdate(id, person, { new: true, runValidators: true, context: 'query' })
     .then(updatedPerson => {
@@ -168,6 +170,9 @@ const errorHandler = (error, request, response, next) => {
 
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
+
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
   }
 
   next(error)
