@@ -43,6 +43,7 @@ app.use((req, res, next) => {
 });
 
 
+
 morgan.token('response-body', (req, res) => {
   
   return req.responseBody;
@@ -73,28 +74,35 @@ app.get('/api/persons/:id', (request, response, next) => {
       if (person) {
         response.json(person);
       } else {
-        response.status(404).end(); // No person found with the given ID
+        response.status(404).end(); 
       }
     })
-    .catch(error => next(error)); // Pass any errors to the error handling middleware
+    .catch(error => next(error))
 });
 
 
 app.get('/api/info', (request, response) => {
-  const currentTime = new Date().toLocaleString();
-  const amountOfPeople = persons.length;
-  response.send(
-    `<div><h2>Amount of people: ${amountOfPeople}</h2>` +
+  Person.countDocuments({})
+  .then(amountOfPeople => {
+    const currentTime = new Date().toLocaleString();
+    response.send(
+      `<div><h2>Amount of people: ${amountOfPeople}</h2>` +
       `<h2>Current Time: ${currentTime}</h2><div/>`
-  );
+    );
+  })
+  .catch(error => {
+    console.error('Error fetching count from database:', error);
+    response.status(500).send('Error fetching information from the server');
+  });
 });
-
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
   const id = Number(request.params.id);
-  persons = persons.filter((person) => person.id !== id);
-
-  response.status(204).end();
-});
+  Person.findByIdAndDelete(request.params.id)
+    .then(result => {
+      response.status(204).end()
+    })
+    .catch(error => next(error))
+})
 
 const generateId = () => {
   const maxId = persons.length > 0 ? Math.max(...persons.map((n) => n.id)) : 0;
@@ -123,6 +131,25 @@ app.post('/api/persons', (request, response, next) => {
     .catch(error => next(error)); // Pass errors to the error handling middleware
 });
 
+app.put('/api/persons/:id', (req, res, next) => {
+  const { id } = req.params;
+  const person = {
+    name: req.body.name,
+    number: req.body.number,
+    // Make sure '_id' is not included here
+  };
+
+  Person.findByIdAndUpdate(id, person, { new: true, runValidators: true, context: 'query' })
+    .then(updatedPerson => {
+      if (updatedPerson) {
+        res.json(updatedPerson);
+      } else {
+        res.status(404).end();
+      }
+    })
+    .catch(error => next(error));
+});
+
 
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' });
@@ -135,6 +162,19 @@ app.listen(PORT, () => {
 });
 
 app.use(unknownEndpoint);
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  }
+
+  next(error)
+}
+
+// tämä tulee kaikkien muiden middlewarejen ja routejen rekisteröinnin jälkeen!
+app.use(errorHandler)
 
 
 

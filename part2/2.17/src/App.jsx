@@ -112,43 +112,37 @@ const App = () => {
     }
   };
 
-  const addNote = (event) => {
+  const addPerson = (event) => {
     event.preventDefault();
     
-    const nameExists = persons.some(person => person.name === newName);
+    const personObject = { name: newName, number: newNumber };
     const existingPerson = persons.find(person => person.name === newName);
-    if (nameExists) {
-      const isConfirmed = window.confirm("Person already exists. Replace old number?");
+    
+    if (existingPerson) {
+      const isConfirmed = window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`);
       if (isConfirmed) {
-        const updatedPerson = { ...existingPerson, number: newNumber };
-
         personService
-          .update(existingPerson.id, updatedPerson)
+          .update(existingPerson.id, personObject)
           .then(response => {
-            // Replace the person in the persons array with the updated person
             setPersons(persons.map(person => person.id !== existingPerson.id ? person : response.data));
             setNewName('');
             setNewNumber('');
-
-            setConfirmationMessage(
-              `Person '${newName}' was changed`
-            )
+            setConfirmationMessage(`Updated ${newName}'s number`);
             setTimeout(() => {
               setConfirmationMessage(null)
-            }, 5000)
-            
+            }, 5000);
           })
           .catch(error => {
+            console.error("Error updating person:", error);
+            
             if (error.response && error.response.status === 404) {
-              setErrorMessage(`The person '${existingPerson.name}' was already deleted from the server.`);
+              setErrorMessage(`Information of ${newName} has already been removed from server`);
               setTimeout(() => {
                 setErrorMessage(null);
               }, 5000);
-          
-              
-              setPersons(persons.filter(person => person.id !== existingPerson.id));
+              setPersons(persons.filter(person => person.id !== existingPerson.id)); // Remove from local state
             } else {
-              console.error(error);
+              
               setErrorMessage("An error occurred while updating the person's number.");
               setTimeout(() => {
                 setErrorMessage(null);
@@ -156,27 +150,27 @@ const App = () => {
             }
           });
       }
-      return;
+    } else {
+      
+      personService
+        .create(personObject)
+        .then(response => {
+          setPersons(persons.concat(response.data));
+          setNewName('');
+          setNewNumber('');
+          setConfirmationMessage(`Added ${newName}`);
+          setTimeout(() => {
+            setConfirmationMessage(null)
+          }, 5000);
+        })
+        .catch(error => {
+          console.error("Error adding person:", error);
+          setErrorMessage("Failed to add person. Please try again.");
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 5000);
+        });
     }
-    
-    const nameObject = { name: newName, number: newNumber };
-    setPersons(persons.concat(nameObject));
-    setNewName('');
-    setNewNumber('');
-
-    setConfirmationMessage(
-      `Person '${newName}' was added`
-    )
-    setTimeout(() => {
-      setConfirmationMessage(null)
-    }, 5000)
-
-    personService
-      .create(nameObject)
-      .then(response => {
-        setPersons(persons.concat(response.data))
-        setNewName('')
-      })
   };
 
   const handleNameChange = (event) => setNewName(event.target.value);
@@ -197,7 +191,7 @@ const App = () => {
       <h3>Add a new person</h3>
 
       <PersonForm 
-        onSubmit={addNote}
+        onSubmit={addPerson}
         newName={newName}
         newNumber={newNumber}
         handleNameChange={handleNameChange}
