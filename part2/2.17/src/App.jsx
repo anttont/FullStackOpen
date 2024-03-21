@@ -134,8 +134,16 @@ const App = () => {
           })
           .catch(error => {
             console.error("Error updating person:", error);
+
+            if (error.response && error.response.status === 400) {
+              setErrorMessage(`Name or is not valid`);
+              setTimeout(() => {
+                setErrorMessage(null);
+              }, 5000);
+              setPersons(persons.filter(person => person.id !== existingPerson.id)); // Remove from local state
+            }
             
-            if (error.response && error.response.status === 404) {
+            else if (error.response && error.response.status === 404) {
               setErrorMessage(`Information of ${newName} has already been removed from server`);
               setTimeout(() => {
                 setErrorMessage(null);
@@ -164,11 +172,21 @@ const App = () => {
           }, 5000);
         })
         .catch(error => {
-          console.error("Error adding person:", error);
+          if (error.response && error.response.status === 400) {
+            setErrorMessage(`Name or number is not valid`);
+            setTimeout(() => {
+              setErrorMessage(null);
+            }, 5000);
+            
+          } else {
+            
+            console.error("Error adding person:", error);
           setErrorMessage("Failed to add person. Please try again.");
           setTimeout(() => {
             setErrorMessage(null);
           }, 5000);
+          }
+          
         });
     }
   };
