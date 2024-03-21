@@ -1,19 +1,19 @@
+require('dotenv').config()
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors')
-
-
 const app = express();
+const Person = require('./models/person')
+
+const mongoose = require('mongoose')
+const password = "a1k4SvHsmKTpm6Fy"
+
 
 // Define a custom token for Morgan to log request body
 morgan.token('body', (req, res) => {
   return JSON.stringify(req.body);
 });
 
-// Define a custom token for Morgan to log request parameters
-morgan.token('params', (req, res) => {
-  return JSON.stringify(req.params);
-});
 
 // Use Morgan to log the request and include the custom token for the response body
 app.use(morgan(':method :url :status :response-time ms - response-body: :response-body'));
@@ -49,26 +49,7 @@ morgan.token('response-body', (req, res) => {
 });
 
 let persons = [
-  {
-    name: 'Arto Helas',
-    number: '050',
-    id: '1',
-  },
-  {
-    name: 'Ada Lovelace',
-    number: '39-44-5323523',
-    id: '2',
-  },
-  {
-    name: 'Dan Abramov',
-    number: '12-43-234345',
-    id: '3',
-  },
-  {
-    name: 'Mary Poppendieck',
-    number: '39-23-6423122',
-    id: '4',
-  },
+  
 ];
 
 app.get('/', (request, response) => {
@@ -76,20 +57,28 @@ app.get('/', (request, response) => {
 });
 
 app.get('/api/persons', (request, response) => {
-  response.json(persons);
+  Person.find({}).then(persons => {
+    
+    response.json(persons)
+  })
 });
 
 
-app.get('/api/persons/:id', (request, response) => {
+
+app.get('/api/persons/:id', (request, response, next) => {
   const id = request.params.id;
-  const person = persons.find((person) => person.id === id);
 
-  if (person) {
-    response.json(person);
-  } else {
-    response.status(404).end();
-  }
+  Person.findById(id)
+    .then(person => {
+      if (person) {
+        response.json(person);
+      } else {
+        response.status(404).end(); // No person found with the given ID
+      }
+    })
+    .catch(error => next(error)); // Pass any errors to the error handling middleware
 });
+
 
 app.get('/api/info', (request, response) => {
   const currentTime = new Date().toLocaleString();
@@ -112,40 +101,35 @@ const generateId = () => {
   return maxId + 1;
 };
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
   const body = request.body;
 
+  // Check if name or number is missing from the request body
   if (!body.name || !body.number) {
-    return response.status(400).json({
-      error: 'name or number is missing',
-    });
+    return response.status(400).json({ error: 'name or number is missing' });
   }
 
-  const nameExists = persons.some((person) => person.name === body.name);
-
-  if (nameExists) {
-    return response.status(400).json({
-      error: 'person is already present',
-    });
-  }
-
-  const person = {
-    id: generateId(),
+  // Create a new person instance using the model
+  const person = new Person({
     name: body.name,
     number: body.number,
-  };
+  });
 
-  persons = persons.concat(person);
-
-  response.json(person);
+  // Save the person instance to the database
+  person.save()
+    .then(savedPerson => {
+      response.json(savedPerson);
+    })
+    .catch(error => next(error)); // Pass errors to the error handling middleware
 });
+
 
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' });
 };
 
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
