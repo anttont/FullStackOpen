@@ -31,9 +31,71 @@ const getMaxLikesBlog = (blogs) => {
   return maxLikesBlog
 }
 
+function getMostBlogsAuthor(blogs) {
+  if (blogs.length === 0) {
+    return null
+  }
+
+  const authorCounts = {}
+
+
+  blogs.forEach(blog => {
+    const author = blog.author
+    authorCounts[author] = (authorCounts[author] || 0) + 1
+  })
+
+  let maxBlogs = 0
+  let topAuthor = ''
+
+
+  for (const author in authorCounts) {
+    if (authorCounts[author] > maxBlogs) {
+      maxBlogs = authorCounts[author]
+      topAuthor = author
+    }
+  }
+
+  return {
+    author: topAuthor,
+    blogs: maxBlogs
+  }
+}
+
+function getMostLikedAuthor(blogs) {
+  if (blogs.length === 0) {
+    return null
+  }
+
+  const likesByAuthor = {}
+
+
+  blogs.forEach(blog => {
+    const author = blog.author
+    likesByAuthor[author] = (likesByAuthor[author] || 0) + blog.likes
+  })
+
+  let maxLikes = 0
+  let topAuthor = ''
+
+
+  for (const author in likesByAuthor) {
+    if (likesByAuthor[author] > maxLikes) {
+      maxLikes = likesByAuthor[author]
+      topAuthor = author
+    }
+  }
+
+  return {
+    author: topAuthor,
+    likes: maxLikes
+  }
+}
+
 module.exports = {
   dummy,
   totalLikes,
-  getMaxLikesBlog
+  getMaxLikesBlog,
+  getMostBlogsAuthor,
+  getMostLikedAuthor
 }
 
