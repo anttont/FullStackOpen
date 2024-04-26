@@ -63,6 +63,34 @@ test('a valid note can be added ', async () => {
   assert(contents.includes('Async'))
 })
 
+test.only('an empty likes field is fixed', async () => {
+  const newBlog = {
+    title: 'Async',
+    author: 'Testi',
+    url: 'www.Async.fi',
+    likes: undefined
+  }
+
+  const correctBlog = {
+    title: 'Async',
+    author: 'Testi',
+    url: 'www.Async.fi',
+    likes: 0
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const response = await api.get('/api/blogs')
+
+  const createdBlog = response.body.find(blog => blog.title === newBlog.title)
+
+  assert.strictEqual(createdBlog.likes, correctBlog.likes, 'Empty likes field should be fixed to 0')
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
