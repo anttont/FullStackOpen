@@ -91,6 +91,50 @@ test.only('an empty likes field is fixed', async () => {
   assert.strictEqual(createdBlog.likes, correctBlog.likes, 'Empty likes field should be fixed to 0')
 })
 
+test('a blog can be deleted', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  const blogToDelete = blogsAtStart[0]
+
+
+  await api
+    .delete(`/api/blogs/${blogToDelete.id}`)
+    .expect(204)
+
+  const blogsAtEnd = await helper.blogsInDb()
+
+  const contents = blogsAtEnd.map(r => r.title)
+  assert(!contents.includes(blogToDelete.title))
+
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
+})
+
+test('a blog can be updated', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  const blogToUpdate = blogsAtStart[0]
+
+  const updatedBlogData = {
+    title: 'Updated Title',
+    author: 'Updated Author',
+    url: 'www.updatedurl.com',
+    likes: 10,
+  }
+
+  await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send(updatedBlogData)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  const blogsAtEnd = await helper.blogsInDb()
+
+  const updatedBlog = blogsAtEnd.find(blog => blog.id === blogToUpdate.id)
+  assert.strictEqual(updatedBlog.title, updatedBlogData.title, 'Title should be updated')
+  assert.strictEqual(updatedBlog.author, updatedBlogData.author, 'Author should be updated')
+  assert.strictEqual(updatedBlog.url, updatedBlogData.url, 'URL should be updated')
+  assert.strictEqual(updatedBlog.likes, updatedBlogData.likes, 'Likes should be updated')
+})
+
+
 after(async () => {
   await mongoose.connection.close()
 })
