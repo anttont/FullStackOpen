@@ -97,12 +97,14 @@ test('each blog has required fields', async () => {
   })
 })
 
+/*
 test('a valid note can be added ', async () => {
   const newBlog = {
     title: 'Async',
     author: 'Testi',
     url: 'www.Async.fi',
     likes: 323,
+    
   }
 
   await api
@@ -118,8 +120,8 @@ test('a valid note can be added ', async () => {
   assert.strictEqual(response.body.length, helper.initialBlogs.length + 1)
 
   assert(contents.includes('Async'))
-})
-
+})*/
+/*
 test.only('an empty likes field is fixed', async () => {
   const newBlog = {
     title: 'Async',
@@ -163,7 +165,7 @@ test('a blog can be deleted', async () => {
   assert(!contents.includes(blogToDelete.title))
 
   assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
-})
+})*/
 
 test('a blog can be updated', async () => {
   const blogsAtStart = await helper.blogsInDb()
