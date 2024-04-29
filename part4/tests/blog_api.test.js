@@ -8,6 +8,7 @@ const helper = require('./tests_helper')
 const Blog = require('../models/blog')
 const bcrypt = require('bcrypt')
 const User = require('../models/user')
+const jwt = require('jsonwebtoken')
 
 beforeEach(async () => {
   await Blog.deleteMany({})
@@ -97,18 +98,39 @@ test('each blog has required fields', async () => {
   })
 })
 
-/*
-test('a valid note can be added ', async () => {
+
+test('a valid blog can be added ', async () => {
+
+  const newUser = {
+    username: 'tester',
+    name: 'test',
+    password: 'salainen',
+  }
+
+  const savedUser = await api.post('/api/users').send(newUser)
+
+  const userForToken = {
+    username: savedUser.body.username,
+    id: savedUser.body.id,
+  }
+
+  const token = jwt.sign(
+    userForToken,
+    process.env.SECRET,
+    { expiresIn: 60*60 }
+  )
+
   const newBlog = {
     title: 'Async',
     author: 'Testi',
     url: 'www.Async.fi',
     likes: 323,
-
+    user: savedUser.body.id
   }
 
   await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
@@ -120,25 +142,81 @@ test('a valid note can be added ', async () => {
   assert.strictEqual(response.body.length, helper.initialBlogs.length + 1)
 
   assert(contents.includes('Async'))
-})*/
-/*
-test.only('an empty likes field is fixed', async () => {
+})
+
+test('a blog without authentication is not added ', async () => {
+  const newUser = {
+    username: 'testernotoken',
+    name: 'testnotoken',
+    password: 'salainen',
+  }
+
+  const savedUser = await api.post('/api/users').send(newUser)
+
   const newBlog = {
     title: 'Async',
     author: 'Testi',
     url: 'www.Async.fi',
-    likes: undefined
+    likes: 323,
+    user: savedUser.body.id
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(401) // Expecting 401 for unauthorized access
+    .expect('Content-Type', /application\/json/)
+
+  const response = await api.get('/api/blogs')
+
+  const contents = response.body.map(r => r.title)
+
+  assert.strictEqual(response.status, 200) // Ensure the status code is 200
+
+  assert(!contents.includes('Async')) // Ensure the blog was not added
+})
+
+
+test.only('an empty likes field is fixed', async () => {
+
+  const newUser = {
+    username: 'testerempty',
+    name: 'empty',
+    password: 'salainen',
+  }
+
+  const savedUser = await api.post('/api/users').send(newUser)
+
+  const userForToken = {
+    username: savedUser.body.username,
+    id: savedUser.body.id,
+  }
+
+  const token = jwt.sign(
+    userForToken,
+    process.env.SECRET,
+    { expiresIn: 60*60 }
+  )
+
+  const newBlog = {
+    title: 'Async',
+    author: 'Testi',
+    url: 'www.Async.fi',
+    likes: undefined,
+    user: savedUser.body.id
   }
 
   const correctBlog = {
     title: 'Async',
     author: 'Testi',
     url: 'www.Async.fi',
-    likes: 0
+    likes: 0,
+    user: savedUser.body.id
   }
 
   await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
@@ -150,22 +228,53 @@ test.only('an empty likes field is fixed', async () => {
   assert.strictEqual(createdBlog.likes, correctBlog.likes, 'Empty likes field should be fixed to 0')
 })
 
-test('a blog can be deleted', async () => {
-  const blogsAtStart = await helper.blogsInDb()
-  const blogToDelete = blogsAtStart[0]
+test('a blog can be deleted by the user who created it', async () => {
 
+  const newUser = {
+    username: 'deletetester',
+    name: 'delete',
+    password: 'salainen',
+  }
+
+  const savedUser = await api.post('/api/users').send(newUser)
+
+  const userForToken = {
+    username: savedUser.body.username,
+    id: savedUser.body.id,
+  }
+
+  const token = jwt.sign(
+    userForToken,
+    process.env.SECRET,
+    { expiresIn: 60*60 }
+  )
+
+  const newBlog = {
+    title: 'delete',
+    author: 'delete',
+    url: 'www.Async.fi',
+    likes: 1,
+    user: savedUser.body.id
+  }
+
+  const savedBlogResponse = await api
+    .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
+    .send(newBlog)
+
+  const savedBlog = savedBlogResponse.body
 
   await api
-    .delete(`/api/blogs/${blogToDelete.id}`)
+    .delete(`/api/blogs/${savedBlog.id}`)
+    .set('Authorization', `Bearer ${token}`)
     .expect(204)
 
   const blogsAtEnd = await helper.blogsInDb()
+  const remainingBlog = blogsAtEnd.find(blog => blog.id === savedBlog.id)
+  assert.strictEqual(remainingBlog, undefined, 'Blog should be deleted by the user who created it')
+})
 
-  const contents = blogsAtEnd.map(r => r.title)
-  assert(!contents.includes(blogToDelete.title))
 
-  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
-})*/
 
 test('a blog can be updated', async () => {
   const blogsAtStart = await helper.blogsInDb()
