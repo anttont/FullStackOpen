@@ -1,6 +1,5 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
-const User = require('../models/user')
 const jwt = require('jsonwebtoken')
 
 
@@ -22,10 +21,10 @@ blogsRouter.get('/:id', async (request, response) => {
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
+  const user = request.user
 
-  if (!request.token || !decodedToken.id) {
-    return response.status(401).json({ error: 'token missing or invalid' })
+  if (!user) {
+    return response.status(401).json({ error: 'user not authenticated' })
   }
 
   const blogToDelete = await Blog.findById(request.params.id)
@@ -33,8 +32,7 @@ blogsRouter.delete('/:id', async (request, response) => {
   if (!blogToDelete) {
     return response.status(404).json({ error: 'blog not found' })
   }
-
-  if (decodedToken.id !== blogToDelete.user.toString()) {
+  if (user.id !== blogToDelete.user.toString()) {
     return response.status(403).json({ error: 'forbidden: cannot delete other user\'s blog' })
   }
 
@@ -75,7 +73,8 @@ blogsRouter.post('/', async (request, response) => {
   if (!decodedToken.id) {
     return response.status(401).json({ error: 'token invalid' })
   }
-  const user = await User.findById(decodedToken.id)
+
+  const user = request.user
 
   if (body.likes === undefined || body.likes === null || body.likes === '') {
     body.likes = 0
