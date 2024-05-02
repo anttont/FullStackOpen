@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import { Notification, ErrorNotification } from './components/Notification';
+
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -11,6 +13,9 @@ const App = () => {
   const [author, setAuthor] = useState('') 
   const [url, setUrl] = useState('')  
   const [user, setUser] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
+  const [message, setMessage] = useState(null)
+
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -43,11 +48,19 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
+      setMessage("Login successfull")
+      setTimeout(() => {
+        setMessage(
+          null
+        )
+      }, 5000)
     } catch (exception) {
-      console.log('wrong credentials')
+      setErrorMessage("Wrong credentials")
       console.log(exception)
       setTimeout(() => {
-        //setErrorMessage(null)
+        setErrorMessage(
+          null
+        )
       }, 5000)
     }
   }
@@ -68,6 +81,12 @@ const App = () => {
       setTitle('');
       setAuthor('');
       setUrl('');
+      setMessage("Blog added")
+      setTimeout(() => {
+        setMessage(
+          null
+        )
+      }, 5000)
     } catch (error) {
       console.error('Failed to add blog:', error);
     }
@@ -153,6 +172,9 @@ const App = () => {
 
   return (
     <div>     
+
+      <ErrorNotification message={errorMessage} />
+      <Notification message={message} />
 
       <h2>Login</h2>
 
