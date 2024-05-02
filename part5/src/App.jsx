@@ -49,7 +49,10 @@ const App = () => {
     }
   }
 
-  
+  const handleLogout = () => {
+    window.localStorage.removeItem('loggedNoteappUser');
+    setUser(null);
+  }
 
   const loginForm = () => (
     <form onSubmit={handleLogin}>
@@ -82,7 +85,7 @@ const App = () => {
         <Blog key={blog.id} blog={blog} />
       )}
 
-    
+    <button onClick={handleLogout}>logout</button>
     </div>
   )
 
