@@ -136,52 +136,6 @@ const App = () => {
     )
   }
 
-  const blogForm = () => (
-
-    <><div>
-      <h1>
-        Add a blog
-      </h1>
-
-      <form onSubmit={handleAddBlog}>
-      <div>
-        title 
-          <input
-          type="text"
-          value={title}
-          name="Username"
-          onChange={({ target }) => setTitle(target.value)}
-        />
-      </div>
-      <div>
-        author 
-          <input
-          type="text"
-          value={author}
-          name="Password"
-          onChange={({ target }) => setAuthor(target.value)}
-        />
-      </div>
-
-      <div>
-        url 
-          <input
-          type="text"
-          value={url}
-          name="Password"
-          onChange={({ target }) => setUrl(target.value)}
-        />
-      </div>
-
-      <button type="submit">Add</button>
-    </form>   
-
-    </div>
-    <div>
-        
-
-      </div></>
-  )
 
   return (
     <div>     
