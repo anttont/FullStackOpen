@@ -68,7 +68,7 @@ const App = () => {
     }
   }
 
-  const handleNoteChange = (event) => {
+const handleNoteChange = (event) => {
     setBlogs(event.target.value)
   }
 
