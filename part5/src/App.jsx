@@ -123,8 +123,11 @@ const App = () => {
       </Togglable>
 
       <h2>Blogs</h2>
-        {blogs.map(blog => <Blog key={blog.id} blog={blog} />
-        )}
+      {blogs
+      .slice() // Create a copy of the array to avoid mutating the original
+      .sort((a, b) => b.likes - a.likes) // Sort by likes count in descending order
+      .map(blog => <Blog key={blog.id} blog={blog} />)
+      }
       </div>
      } 
 

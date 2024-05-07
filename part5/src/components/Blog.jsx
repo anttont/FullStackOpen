@@ -39,14 +39,14 @@ const Blog = ({ blog }) => {
   return (
     <div className="blog" style={blogStyle}>
       <div>
-        <strong>{blog.title}</strong> {blog.author}
+        <strong>{blog.title}</strong> 
         <button onClick={toggleDetails} style={buttonStyle}>
           {showDetails ? 'Hide Details' : 'Show Details'}
         </button>
       </div>
       {showDetails && (
         <div>
-        <p>User ID: {blog.userId}</p>
+        <p>{blog.author}</p>
         <p>{blog.url}</p>
         <p>Likes: {likes}</p>
         <button onClick={handleLike} style={buttonStyle}>Like</button>
