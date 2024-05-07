@@ -18,6 +18,13 @@ const BlogForm = ({ createBlog }) => {
     setNewBlog('')
   }
 
+  const addLike = (event) => {
+    event.preventDefault()
+   
+
+    setNewBlog('')
+  }
+
   return (
     <div>
       <h2>Create a new note</h2>
@@ -38,7 +45,7 @@ const BlogForm = ({ createBlog }) => {
           value={url}
           onChange={event => setUrl(event.target.value)}
         />
-        <button type="submit">save</button>
+        <button type="submit"onClick={addLike}>save</button>
       </form>
     </div>
   )

@@ -68,10 +68,6 @@ const App = () => {
     }
   }
 
-const handleNoteChange = (event) => {
-    setBlogs(event.target.value)
-  }
-
   const addBlog = (blogObject) => {
     blogFormRef.current.toggleVisibility()
     blogService
@@ -80,33 +76,6 @@ const handleNoteChange = (event) => {
         setBlogs(blogs.concat(returnedBlog))
       })
   }
-
-  const handleAddBlog = async (event) => {
-    event.preventDefault();
-  
-    try {
-      const newBlog = {
-        title,
-        author,
-        url,
-      };
-      const createdBlog = await blogService.create(newBlog);
-  
-      setBlogs([...blogs, createdBlog]);
-  
-      setTitle('');
-      setAuthor('');
-      setUrl('');
-      setMessage("Blog added")
-      setTimeout(() => {
-        setMessage(
-          null
-        )
-      }, 5000)
-    } catch (error) {
-      console.error('Failed to add blog:', error);
-    }
-  };
 
   const handleLogout = () => {
     window.localStorage.removeItem('loggedNoteappUser');
