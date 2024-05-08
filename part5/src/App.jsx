@@ -77,6 +77,11 @@ const App = () => {
       })
   }
 
+  const handleDelete = (deletedBlogId) => {
+    setBlogs(blogs.filter(blog => blog.id !== deletedBlogId));
+    alert("Blog deleted")
+  };
+
   const handleLogout = () => {
     window.localStorage.removeItem('loggedNoteappUser');
     setUser(null);
@@ -124,16 +129,13 @@ const App = () => {
 
       <h2>Blogs</h2>
       {blogs
-      .slice() // Create a copy of the array to avoid mutating the original
-      .sort((a, b) => b.likes - a.likes) // Sort by likes count in descending order
-      .map(blog => <Blog key={blog.id} blog={blog} />)
+      .slice() 
+      .sort((a, b) => b.likes - a.likes) 
+      .map(blog => <Blog key={blog.id} blog={blog} authToken={user.token} onDelete={handleDelete}/>)
       }
       </div>
      } 
-
-
-      
-    </div>
+  </div>
   )
 }
 
