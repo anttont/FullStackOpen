@@ -5,15 +5,15 @@ import loginService from './services/login'
 import Togglable from './components/Togglable'
 import LoginForm from './components/Login'
 import BlogForm from './components/BlogForm'
-import { Notification, ErrorNotification } from './components/Notification';
+import { Notification, ErrorNotification } from './components/Notification'
 
 
 const App = () => {
   const [loginVisible, setLoginVisible] = useState(false)
   const [blogs, setBlogs] = useState([])
-  const [username, setUsername] = useState('') 
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  
+
   const [user, setUser] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
   const [message, setMessage] = useState(null)
@@ -23,7 +23,7 @@ const App = () => {
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
-    )  
+    )
   }, [])
 
   useEffect(() => {
@@ -37,7 +37,7 @@ const App = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault()
-    
+
     try {
       const user = await loginService.login({
         username, password,
@@ -45,20 +45,20 @@ const App = () => {
 
       window.localStorage.setItem(
         'loggedNoteappUser', JSON.stringify(user)
-      ) 
+      )
 
       blogService.setToken(user.token)
       setUser(user)
       setUsername('')
       setPassword('')
-      setMessage("Login successfull")
+      setMessage('Login successfull')
       setTimeout(() => {
         setMessage(
           null
         )
       }, 5000)
     } catch (exception) {
-      setErrorMessage("Wrong credentials")
+      setErrorMessage('Wrong credentials')
       console.log(exception)
       setTimeout(() => {
         setErrorMessage(
@@ -78,13 +78,13 @@ const App = () => {
   }
 
   const handleDelete = (deletedBlogId) => {
-    setBlogs(blogs.filter(blog => blog.id !== deletedBlogId));
-    alert("Blog deleted")
-  };
+    setBlogs(blogs.filter(blog => blog.id !== deletedBlogId))
+    alert('Blog deleted')
+  }
 
   const handleLogout = () => {
-    window.localStorage.removeItem('loggedNoteappUser');
-    setUser(null);
+    window.localStorage.removeItem('loggedNoteappUser')
+    setUser(null)
   }
 
   const loginForm = () => {
@@ -112,30 +112,30 @@ const App = () => {
 
 
   return (
-    <div>     
+    <div>
 
       <ErrorNotification message={errorMessage} />
       <Notification message={message} />
 
       {!user && loginForm()}
       {user && <div>
-       <p>{user.name} logged in</p>
-       <button onClick={handleLogout}>logout</button>
-       <Togglable buttonLabel="new blog" ref={blogFormRef}>
-       
-       <BlogForm createBlog={addBlog} />
-        
-      </Togglable>
+        <p>{user.name} logged in</p>
+        <button onClick={handleLogout}>logout</button>
+        <Togglable buttonLabel="new blog" ref={blogFormRef}>
 
-      <h2>Blogs</h2>
-      {blogs
-      .slice() 
-      .sort((a, b) => b.likes - a.likes) 
-      .map(blog => <Blog key={blog.id} blog={blog} authToken={user.token} onDelete={handleDelete}/>)
-      }
+          <BlogForm createBlog={addBlog} />
+
+        </Togglable>
+
+        <h2>Blogs</h2>
+        {blogs
+          .slice()
+          .sort((a, b) => b.likes - a.likes)
+          .map(blog => <Blog key={blog.id} blog={blog} authToken={user.token} onDelete={handleDelete}/>)
+        }
       </div>
-     } 
-  </div>
+      }
+    </div>
   )
 }
 

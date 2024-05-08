@@ -33,16 +33,16 @@ const remove = async (id, token) => {
       headers: {
         Authorization: `Bearer ${token}`
       }
-    });
-    return response.data;
+    })
+    return response.data
   } catch (error) {
-    console.error('Error deleting blog:', error);
-    throw error;
+    console.error('Error deleting blog:', error)
+    throw error
   }
-};
+}
 
 
 
 
 
-export default { getAll, create, update, setToken, remove}
+export default { getAll, create, update, setToken, remove }

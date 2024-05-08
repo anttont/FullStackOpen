@@ -1,36 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import blogService from '../services/blogs';
+import React, { useState, useEffect } from 'react'
+import blogService from '../services/blogs'
 
 const Blog = ({ blog, authToken, onDelete }) => {
-  const [showDetails, setShowDetails] = useState(false);
-  const [likes, setLikes] = useState(blog.likes);
+  const [showDetails, setShowDetails] = useState(false)
+  const [likes, setLikes] = useState(blog.likes)
 
   useEffect(() => {
-    blogService.setToken(authToken);
-  }, [authToken]);
+    blogService.setToken(authToken)
+  }, [authToken])
 
   const toggleDetails = () => {
-    setShowDetails(!showDetails);
-  };
+    setShowDetails(!showDetails)
+  }
 
   const handleLike = async () => {
     try {
-      const updatedBlog = { ...blog, likes: likes + 1 };
-      await blogService.update(blog.id, updatedBlog);
-      setLikes(likes + 1);
+      const updatedBlog = { ...blog, likes: likes + 1 }
+      await blogService.update(blog.id, updatedBlog)
+      setLikes(likes + 1)
     } catch (error) {
-      console.error('Error updating likes:', error);
+      console.error('Error updating likes:', error)
     }
-  };
+  }
 
   const handleDelete = async (id) => {
     try {
-      await blogService.remove(id, authToken);
-      onDelete(id); // Notify parent component about successful deletion
+      await blogService.remove(id, authToken)
+      onDelete(id) // Notify parent component about successful deletion
     } catch (error) {
-      console.error('Failed to delete blog:', error);
+      console.error('Failed to delete blog:', error)
     }
-  };
+  }
 
   const blogStyle = {
     border: '1px solid #ccc',
@@ -38,7 +38,7 @@ const Blog = ({ blog, authToken, onDelete }) => {
     marginBottom: '10px',
     padding: '10px',
     backgroundColor: '#f9f9f9',
-  };
+  }
 
   const buttonStyle = {
     backgroundColor: '#007bff',
@@ -47,7 +47,7 @@ const Blog = ({ blog, authToken, onDelete }) => {
     padding: '5px 10px',
     borderRadius: '5px',
     cursor: 'pointer',
-  };
+  }
 
   return (
     <div className="blog" style={blogStyle}>
@@ -71,10 +71,10 @@ const Blog = ({ blog, authToken, onDelete }) => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default Blog;
+export default Blog
 
 
 

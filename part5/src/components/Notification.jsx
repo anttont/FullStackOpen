@@ -11,16 +11,16 @@ const ErrorNotification = ({ message }) => {
 }
 
 const Notification = ({ message }) => {
-    if (message === null) {
-      return null
-    }
-  
-    return (
-      <div className="confirmation">
-        {message}
-      </div>
-    )
+  if (message === null) {
+    return null
   }
-  
 
-export{ Notification, ErrorNotification}
+  return (
+    <div className="confirmation">
+      {message}
+    </div>
+  )
+}
+
+
+export{ Notification, ErrorNotification }
