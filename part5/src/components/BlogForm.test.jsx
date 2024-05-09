@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import BlogForm from './BlogForm'
 import userEvent from '@testing-library/user-event'
-
+//Osa 5.16
 test('<BlogForm /> updates parent state and calls onSubmit', async () => {
   const user = userEvent.setup()
   const createBlog = vi.fn()
