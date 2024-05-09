@@ -9,13 +9,13 @@ const BlogForm = ({ createBlog }) => {
   const addBlog = (event) => {
     event.preventDefault()
     createBlog({
-      title: author,
-      author: title,
+      title: title,
+      author: author,
       url: url
-
     })
-
-    setNewBlog('')
+    setAuthor('')
+    setTitle('')
+    setUrl('')
   }
 
 
@@ -26,20 +26,24 @@ const BlogForm = ({ createBlog }) => {
       <form onSubmit={addBlog}>
         <p>Author</p>
         <input
+          id="author-input"
           value={author}
           onChange={event => setAuthor(event.target.value)}
+          placeholder='Whos the author?'
         />
-        <p>Title</p>
         <input
+          id="title-input"
           value={title}
           onChange={event => setTitle(event.target.value)}
+          placeholder='Title of the blog?'
         />
-        <p>Url</p>
         <input
+          id="url-input"
           value={url}
           onChange={event => setUrl(event.target.value)}
+          placeholder='URL to blog'
         />
-        <button type="submit"onClick={addBlog}>save</button>
+        <button type="submit">save</button>
       </form>
     </div>
   )
