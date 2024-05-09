@@ -85,3 +85,27 @@ test('renders all content after button press', async () => {
   expect(element2).toBeDefined()
   expect(element3).toBeDefined()
 })
+
+test('clicking like button twice calls event handler twice', async () => {
+  const blog = {
+    title: 'Async is cool testing testing',
+    author: 'Testi',
+    url: 'www.Async.fi',
+    likes: 323,
+  }
+
+  const mockHandler = vi.fn()
+
+  render(<Blog blog={blog} mockHandler={mockHandler} />)
+
+  const user = userEvent.setup()
+  const showButton = screen.getByText('Show Details')
+  await user.click(showButton)
+
+  const likeButton = screen.getByText('Like')
+
+  await user.click(likeButton)
+  await user.click(likeButton)
+
+  expect(mockHandler.mock.calls).toHaveLength(2)
+})

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import blogService from '../services/blogs'
 
-const Blog = ({ blog, authToken, onDelete }) => {
+const Blog = ({ blog, authToken, onDelete, mockHandler }) => {
   const [showDetails, setShowDetails] = useState(false)
   const [likes, setLikes] = useState(blog.likes)
 
@@ -13,7 +13,10 @@ const Blog = ({ blog, authToken, onDelete }) => {
     setShowDetails(!showDetails)
   }
 
+
+
   const handleLike = async () => {
+    mockHandler() // for testing
     try {
       const updatedBlog = { ...blog, likes: likes + 1 }
       await blogService.update(blog.id, updatedBlog)
