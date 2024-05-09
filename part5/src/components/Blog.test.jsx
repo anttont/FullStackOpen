@@ -60,3 +60,28 @@ test('renders only title', () => {
   expect(element).toBeDefined()
 })
 
+test('renders all content after button press', async () => {
+
+  const user = userEvent.setup()
+
+  const blog = {
+    title: 'Async is cool testing testing',
+    author: 'Testi',
+    url: 'www.Async.fi',
+    likes: 323,
+    //user: savedUser.body.id
+  }
+
+  render(<Blog blog={blog} />)
+
+  const showButton = screen.getByText('Show Details')
+
+  await user.click(showButton)
+
+  const element1 = screen.getByText('Async is cool testing testing')
+  const element2 = screen.getByText('Testi')
+  const element3 = screen.getByText('www.Async.fi')
+  expect(element1).toBeDefined()
+  expect(element2).toBeDefined()
+  expect(element3).toBeDefined()
+})
