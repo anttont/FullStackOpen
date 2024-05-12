@@ -68,5 +68,24 @@ describe('Blog app', () => {
   
       
     })
+
+    test('a blog can be liked when Show Details is pressed', async ({ page }) => {
+
+      await page.getByTestId('showdetails').first().click();
+
+      const initialLikes = page.getByTestId('likes', el => el.textContent);
+    
+      await expect(page.getByRole('button', { name: 'Like' })).toBeVisible();
+    
+      await page.getByRole('button', { name: 'Like' }).click();
+
+      const updatedLikes = page.getByTestId('likes', el => el.textContent);
+
+      const initialLikesCount = parseInt(initialLikes);
+      const updatedLikesCount = parseInt(updatedLikes);
+    
+      expect(updatedLikesCount).toBe(initialLikesCount + 1);
+    });
+    
   })  
 })

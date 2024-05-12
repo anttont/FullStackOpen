@@ -56,7 +56,7 @@ const Blog = ({ blog, authToken, onDelete, mockHandler }) => {
     <div className="blog" style={blogStyle}>
       <div>
         <strong>{blog.title}</strong>
-        <button onClick={toggleDetails} style={buttonStyle}>
+        <button onClick={toggleDetails} style={buttonStyle} data-testid='showdetails' >
           {showDetails ? 'Hide Details' : 'Show Details'}
         </button>
       </div>
@@ -65,7 +65,7 @@ const Blog = ({ blog, authToken, onDelete, mockHandler }) => {
           <p>{blog.author}</p>
           <p>{blog.url}</p>
           <p>Likes: {likes}</p>
-          <button onClick={handleLike} style={buttonStyle}>
+          <button onClick={handleLike} style={buttonStyle} data-testid='likes'>
             Like
           </button>
           <button onClick={() => handleDelete(blog.id)} style={buttonStyle}>
