@@ -5,11 +5,11 @@ const loginWith = async (page, username, password)  => {
   await page.getByRole('button', { name: 'login' }).click()
 }
 
-const createNote = async (page, content) => {
+const createBlog = async (page, content) => {
   await page.getByRole('button', { name: 'new blog' }).click()
   await page.getByRole('textbox').fill(content)
   await page.getByRole('button', { name: 'save' }).click()
   await page.getByText(content).waitFor()
 }
 
-export { loginWith, createNote }
+export { loginWith, createBlog }
