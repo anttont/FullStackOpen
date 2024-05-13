@@ -17,8 +17,8 @@ describe('Blog app', () => {
     await request.post('/api/testing/reset')
     await request.post('/api/users', {
       data: {
-        name: 'anton',
-        username: 'antto',
+        name: 'test',
+        username: 'tester',
         password: 'salainen'
       }
     })
@@ -28,25 +28,25 @@ describe('Blog app', () => {
 
 
   test('user can login with correct credentials', async ({ page }) => {
-    await loginWith(page, 'antto', 'salainen')
+    await loginWith(page, 'tester', 'salainen')
   
-    await expect(page.getByText('anton logged in')).toBeVisible()
+    await expect(page.getByText('test logged in')).toBeVisible()
   })
 
   
   test('login fails with wrong password', async ({ page }) => {
-    await loginWith(page, 'antto', 'wrong')
+    await loginWith(page, 'tester', 'wrong')
 
     const errorDiv = await page.locator('.error')
     await expect(errorDiv).toContainText('Wrong credentials')
     await expect(errorDiv).toHaveCSS('border-style', 'solid')
     await expect(errorDiv).toHaveCSS('color', 'rgb(255, 0, 0)')
-    await expect(page.getByText('anton logged in')).not.toBeVisible()
+    await expect(page.getByText('test logged in')).not.toBeVisible()
   })  
 
   describe('when logged in', () => {
     beforeEach(async ({ page }) => {
-      await loginWith(page, 'antto', 'salainen')
+      await loginWith(page, 'tester', 'salainen')
     })
 
     test('a new blog can be created', async ({ page }) => {
@@ -69,6 +69,15 @@ describe('Blog app', () => {
       
     })
 
+    test('delete button can only be seen by the user who added it', async ({ page }) => {
+     //test user has no blogs at this point
+      await page.getByTestId('showdetails').first().click();
+    
+      await expect(page.getByTestId('delete')).not.toBeVisible()
+    
+
+    });
+
     test('a blog can be liked when Show Details is pressed', async ({ page }) => {
 
       await page.getByTestId('showdetails').first().click();
@@ -87,6 +96,8 @@ describe('Blog app', () => {
       expect(updatedLikesCount).toBe(initialLikesCount + 1);
     });
 
+    
+
     test('a blog can be deleted by the user who added it', async ({ page }) => {
      
       await page.getByTestId('showdetails').last().click();
@@ -99,6 +110,8 @@ describe('Blog app', () => {
       const blogTitle = 'a blog created by and deleted by playwright';
       await expect(page.getByText(blogTitle)).not.toBeVisible()
     });
+
+    
     
     
     
