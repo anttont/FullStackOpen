@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
+import userService from './services/users'
 import loginService from './services/login'
 import Togglable from './components/Togglable'
 import LoginForm from './components/Login'
@@ -82,6 +83,11 @@ const App = () => {
     alert('Blog deleted')
   }
 
+  const mockHandler = () =>  {
+    //do nothing
+    //for testing
+  }
+
   const handleLogout = () => {
     window.localStorage.removeItem('loggedNoteappUser')
     setUser(null)
@@ -110,7 +116,6 @@ const App = () => {
     )
   }
 
-
   return (
     <div>
 
@@ -128,10 +133,11 @@ const App = () => {
         </Togglable>
 
         <h2>Blogs</h2>
+
         {blogs
           .slice()
           .sort((a, b) => b.likes - a.likes)
-          .map(blog => <Blog key={blog.id} blog={blog} authToken={user.token} onDelete={handleDelete}/>)
+          .map(blog => <Blog key={blog.id} blog={blog} authToken={user.token} onDelete={handleDelete} user={user.username} mockHandler={mockHandler}/>)
         }
       </div>
       }

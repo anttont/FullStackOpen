@@ -52,10 +52,10 @@ describe('Blog app', () => {
     test('a new blog can be created', async ({ page }) => {
       await page.getByRole('button', { name: 'new blog' }).click()
       await page.getByTestId('author-input').fill('test author')
-      await page.getByTestId('title-input').fill('a blog created by playwright')
+      await page.getByTestId('title-input').fill('a blog created by and deleted by playwright')
       await page.getByTestId('url-input').fill('.com')
       await page.getByRole('button', { name: 'save' }).click()
-      await expect(page.getByText('a blog created by playwright')).toBeVisible()
+      await expect(page.getByText('a blog created by and deleted by playwright')).toBeVisible()
     })
   
 
@@ -86,6 +86,23 @@ describe('Blog app', () => {
     
       expect(updatedLikesCount).toBe(initialLikesCount + 1);
     });
+
+    test('a blog can be deleted by the user who added it', async ({ page }) => {
+     
+      await page.getByTestId('showdetails').last().click();
+    
+      await page.getByTestId('delete', { name: 'Delete' }).click();
+    
+      const dialog = await page.waitForEvent('dialog');
+      await dialog.accept();
+    
+      const blogTitle = 'a blog created by and deleted by playwright';
+      await expect(page.getByText(blogTitle)).not.toBeVisible()
+    });
+    
+    
+    
+    
     
   })  
 })
