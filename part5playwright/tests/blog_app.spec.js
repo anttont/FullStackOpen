@@ -112,6 +112,26 @@ describe('Blog app', () => {
     });
 
     
+    test('blogs are in the correct order', async ({ page }) => {
+      
+      const showDetailsButtons = await page.$$('[data-testid="showdetails"]');
+      await Promise.all(showDetailsButtons.map(async (button) => {
+        await button.click();
+      }));
+    
+      await Promise.all(showDetailsButtons.map(async () => {
+        await page.waitForSelector('[data-testid="like"]', { state: 'visible' });
+      }));
+    
+      const likesAmounts = await page.$$eval('[data-testid="likes"]', likesElements => {
+        return likesElements.map(likesElement => parseInt(likesElement.textContent, 10));
+      });
+
+  
+      for (let i = 0; i < likesAmounts.length - 1; i++) {
+        expect(likesAmounts[i] >= likesAmounts[i + 1]).toBeTruthy();
+      }
+    });
     
     
     
