@@ -1,4 +1,3 @@
-
 const anecdotesAtStart = [
   'If it hurts, do it more often',
   'Adding manpower to a late software project makes it later!',
@@ -18,22 +17,7 @@ const asObject = (anecdote) => {
   }
 }
 
-
-const initialState = {
-  anecdotes: anecdotesAtStart.map(asObject),
-  filter: ''
-}
-
-const SET_FILTER = 'SET_FILTER'
-
-export const setFilter = (filter) => {
-  return {
-    type: SET_FILTER,
-    payload: { filter }
-  }
-}
-
-
+const initialState = anecdotesAtStart.map(asObject)
 
 const VOTE = 'VOTE'
 
@@ -45,7 +29,6 @@ export const voteAnecdote = (id) => {
 }
 
 export const createAnecdote = (content) => {
-  console.log(content)
   return {
     type: 'NEW_ANECDOTE',
     payload: {
@@ -59,28 +42,17 @@ export const createAnecdote = (content) => {
 const anecdoteReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'NEW_ANECDOTE':
-      return {
-        ...state,
-        anecdotes: [...state.anecdotes, action.payload]
-      }
+      return [...state, action.payload]
     case VOTE:
       const id = action.payload.id
-      const anecdoteToVote = state.anecdotes.find(a => a.id === id)
+      const anecdoteToVote = state.find(a => a.id === id)
       const votedAnecdote = {
         ...anecdoteToVote,
         votes: anecdoteToVote.votes + 1
       }
-      return {
-        ...state,
-        anecdotes: state.anecdotes.map(anecdote =>
-          anecdote.id !== id ? anecdote : votedAnecdote
-        )
-      }
-    case SET_FILTER:
-      return {
-        ...state,
-        filter: action.payload.filter
-      }
+      return state.map(anecdote =>
+        anecdote.id !== id ? anecdote : votedAnecdote
+      )
     default:
       return state
   }
