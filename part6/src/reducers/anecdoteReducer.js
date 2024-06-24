@@ -50,7 +50,9 @@ export const addAnecdote = (content) => {
   return async (dispatch) => {
     dispatch(anecdoteSlice.actions.createAnecdote(content))
     dispatch(setNotification(`Anecdote added: ${content}`))
-    
+    setTimeout(() => {
+      dispatch(setNotification(''))
+    }, 5000)
   }
 }
 
