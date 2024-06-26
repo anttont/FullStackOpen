@@ -8,14 +8,15 @@ import AnecdoteForm from './components/AnecdoteForm'
 import anecdotesService from './services/anecdotesService'
 import { setAnecdotes } from './reducers/anecdoteReducer'
 import { useDispatch } from 'react-redux'
+import { initializeNotes } from './reducers/anecdoteReducer'
 
 const App = () => {
 
   const dispatch = useDispatch()
+
   useEffect(() => {
-    anecdotesService
-      .getAll().then(anecdotes => dispatch(setAnecdotes(anecdotes)))
-  }, [])
+    dispatch(initializeNotes()) 
+  }, []) 
 
   return (
     <div>
