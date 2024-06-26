@@ -6,11 +6,11 @@ import { setNotification } from '../reducers/notificationReducer'
 const AnecdoteList = () => {
   const dispatch = useDispatch()
   const anecdotes = useSelector(state => state.anecdotes)
-  const filter = useSelector(state => state.filter)
+  const filter = useSelector(state => state.filter) || ''
 
   const vote = (id) => {
     dispatch(voteAnecdote(id))
-    dispatch(setNotification(`Anecdote voted`))
+    dispatch(setNotification('Anecdote voted'))
     setTimeout(() => {
       dispatch(setNotification(''))
     }, 5000)
@@ -40,6 +40,7 @@ const AnecdoteList = () => {
 }
 
 export default AnecdoteList
+
 
 
 

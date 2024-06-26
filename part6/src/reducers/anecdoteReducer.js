@@ -14,31 +14,30 @@ const anecdoteSlice = createSlice({
       const anecdoteToVote = state.find(n => n.id === id)
       if (anecdoteToVote) {
         anecdoteToVote.votes += 1
-        
       }
-    
-  },
-  appendAnecdote(state, action) {
-    state.push(action.payload)
-  },
-  setAnecdotes(state, action) {
-    return action.payload
+    },
+    appendAnecdote(state, action) {
+      state.push(action.payload)
+    },
+    setAnecdotes(state, action) {
+      return action.payload
+    }
   }
-}
 })
 
-export const { createAnecdote, voteAnecdote, appendAnecdote, setAnecdotes } = anecdoteSlice.actions
+export const { voteAnecdote, appendAnecdote, setAnecdotes } = anecdoteSlice.actions
 
-export const initializeNotes = () => {
+export const initializeAnecdotes = () => {
   return async dispatch => {
     const notes = await anecdotesService.getAll()
     dispatch(setAnecdotes(notes))
   }
 }
 
-export const addAnecdote = (content) => {
-  return async (dispatch) => {
-    dispatch(anecdoteSlice.actions.createAnecdote(content))
+export const addAnecdote = content => {
+  return async dispatch => {
+    const newAnecdote = await anecdotesService.createNew(content)
+    dispatch(appendAnecdote(newAnecdote))
     dispatch(setNotification(`Anecdote added: ${content}`))
     setTimeout(() => {
       dispatch(setNotification(''))
@@ -47,4 +46,5 @@ export const addAnecdote = (content) => {
 }
 
 export default anecdoteSlice.reducer
+
 
