@@ -1,20 +1,13 @@
-const AnecdoteForm = () => {
+import React from 'react'
 
-  const onCreate = (event) => {
-    event.preventDefault()
-    const content = event.target.anecdote.value
-    event.target.anecdote.value = ''
-    console.log('new anecdote')
-}
-
+const AnecdoteForm = ({ onSubmit }) => {
   return (
-    <div>
-      <h3>create new</h3>
-      <form onSubmit={onCreate}>
-        <input name='anecdote' />
-        <button type="submit">create</button>
-      </form>
-    </div>
+    <form onSubmit={onSubmit}>
+      <div>
+        <input name="anecdote" />
+      </div>
+      <button type="submit">create</button>
+    </form>
   )
 }
 
