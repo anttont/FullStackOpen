@@ -34,6 +34,12 @@ const App = () => {
     event.preventDefault()
     const content = event.target.anecdote.value
     event.target.anecdote.value = ''
+
+    if (content.length < 5) {
+      dispatch({ type: 'SET_NOTIFICATION', payload: { message: 'Too short anecdote, must have lenght 5 or more', duration: 5 } })
+      return
+    }
+
     newAnecdoteMutation.mutate({ content, votes: 0 })
   }
 
@@ -74,3 +80,4 @@ const App = () => {
 }
 
 export default App
+
