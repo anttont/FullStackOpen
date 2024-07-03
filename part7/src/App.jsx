@@ -1,5 +1,10 @@
 import { useState } from 'react'
 
+import {
+  BrowserRouter as Router,
+  Routes, Route, Link
+} from 'react-router-dom'
+
 const Menu = () => {
   const padding = {
     paddingRight: 5
@@ -125,10 +130,22 @@ const App = () => {
   return (
     <div>
       <h1>Software anecdotes</h1>
-      <Menu />
-      <AnecdoteList anecdotes={anecdotes} />
-      <About />
-      <CreateNew addNew={addNew} />
+      <Router>
+
+      <div>
+        <Link to="/createnew">Create new </Link>
+        <Link to="/about">About </Link>
+        <Link to="/anecdotes">Anecdotes </Link>
+      </div>
+
+
+    <Routes>
+      <Route path="/createnew" element={<CreateNew />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/anecdotes" element={<AnecdoteList anecdotes={anecdotes}/>} />
+    </Routes>
+    </Router>
+      
       <Footer />
     </div>
   )
