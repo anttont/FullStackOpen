@@ -3,24 +3,25 @@ import { useState } from 'react'
 import {
   BrowserRouter as Router,
   Routes, Route, Link, useMatch, useNavigate
-} from 'react-router-dom'
+} from 'react-router-dom';
+import { useAnecdoteManager } from './hooks';
 
 const Menu = () => {
   const padding = {
     paddingRight: 5
-  }
+  };
   return (
     <div>
-      <a href='#' style={padding}>anecdotes</a>
-      <a href='#' style={padding}>create new</a>
-      <a href='#' style={padding}>about</a>
+      <Link to='/anecdotes' style={padding}>anecdotes</Link>
+      <Link to='/createnew' style={padding}>create new</Link>
+      <Link to='/about' style={padding}>about</Link>
     </div>
-  )
-}
+  );
+};
 
 export const Notification = ({ message }) => {
   if (message === null) {
-    return null
+    return null;
   }
 
   const style = {
@@ -48,15 +49,15 @@ const AnecdoteList = ({ anecdotes }) => (
       )}
     </ul>
   </div>
-)
+);
 
 const Anecdote = ({ anecdote }) => {
   return (
     <div>
      <li key={anecdote.id} >{anecdote.content} <>By: </> {anecdote.author}</li>
     </div>
-  )
-}
+  );
+};
 
 const About = () => (
   <div>
@@ -70,7 +71,7 @@ const About = () => (
 
     <p>Software engineering is full of excellent anecdotes, at this app you can find the best and add more.</p>
   </div>
-)
+);
 
 const Footer = () => (
   <div>
@@ -78,28 +79,29 @@ const Footer = () => (
 
     See <a href='https://github.com/fullstack-hy2020/routed-anecdotes/blob/master/src/App.js'>https://github.com/fullstack-hy2020/routed-anecdotes/blob/master/src/App.js</a> for the source code.
   </div>
-)
+);
 
-const CreateNew = (props) => {
-  const [content, setContent] = useState('')
-  const [author, setAuthor] = useState('')
-  const [info, setInfo] = useState('')
+const CreateNew = ({ addNew }) => {
+  const [content, setContent] = useState('');
+  const [author, setAuthor] = useState('');
+  const [info, setInfo] = useState('');
 
-
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    props.addNew({
+    e.preventDefault();
+    addNew({
       content,
       author,
       info,
       votes: 0
-    })
+    });
 
-    navigate('/anecdotes')
-
-  }
+    setContent('');
+    setAuthor('');
+    setInfo('');
+    navigate('/anecdotes');
+  };
 
   return (
     <div>
@@ -117,87 +119,51 @@ const CreateNew = (props) => {
           url for more info
           <input name='info' value={info} onChange={(e)=> setInfo(e.target.value)} />
         </div>
-        <button >create</button>
+        <button>create</button>
       </form>
     </div>
-  )
-
-}
+  );
+};
 
 const App = () => {
-  const [anecdotes, setAnecdotes] = useState([
-    {
-      content: 'If it hurts, do it more often',
-      author: 'Jez Humble',
-      info: 'https://martinfowler.com/bliki/FrequencyReducesDifficulty.html',
-      votes: 0,
-      id: 1
-    },
-    {
-      content: 'Premature optimization is the root of all evil',
-      author: 'Donald Knuth',
-      info: 'http://wiki.c2.com/?PrematureOptimization',
-      votes: 0,
-      id: 2
-    }
-  ])
+  const {
+    anecdotes,
+    notification,
+    addNew,
+    anecdoteById
+  } = useAnecdoteManager();
 
-  const [notification, setNotification] = useState(null)
-
-  const addNew = (anecdote) => {
-    anecdote.id = Math.round(Math.random() * 10000)
-    setAnecdotes(anecdotes.concat(anecdote))
-    setNotification(
-     `Added ${anecdote.content} `
-    )
-    setTimeout(() => {
-      setNotification(null)
-    }, 5000)
-  }
-
-  const anecdoteById = (id) =>
-    anecdotes.find(a => a.id === id)
-
-  const vote = (id) => {
-    const anecdote = anecdoteById(id)
-
-    const voted = {
-      ...anecdote,
-      votes: anecdote.votes + 1
-    }
-
-    setAnecdotes(anecdotes.map(a => a.id === id ? voted : a))
-  }
-
-  const match = useMatch('/anecdotes/:id')
-  const anecdote = match 
-    ? anecdotes.find(anecdote => anecdote.id === Number(match.params.id))
-    : null
+  const match = useMatch('/anecdotes/:id');
+  const anecdote = match
+    ? anecdoteById(Number(match.params.id))
+    : null;
 
   return (
-    <div>
-
-      <Notification message={notification}/>
-
-      <h1>Software anecdotes</h1>
-      
+    
       <div>
+        <Notification message={notification} />
+
+        <h1>Software anecdotes</h1>
+
+        <div>
         <Link to="/createnew">Create new </Link>
         <Link to="/about">About </Link>
         <Link to="/anecdotes">Anecdotes </Link>
       </div>
+        
 
-    <Routes>
-      <Route path="/anecdotes/:id" element={<Anecdote anecdote={anecdote} />} />
-      <Route path="/createnew" element={<CreateNew addNew={addNew} />} />
-      <Route path="/about" element={<About />} />
-      <Route path="/anecdotes" element={<AnecdoteList anecdotes={anecdotes}/>} />
-    </Routes>
+        <Routes>
+          <Route path="/anecdotes/:id" element={<Anecdote anecdote={anecdote} />} />
+          <Route path="/createnew" element={<CreateNew addNew={addNew} />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/anecdotes" element={<AnecdoteList anecdotes={anecdotes} />} />
+          
+        </Routes>
+        
+        <Footer />
+      </div>
     
-      
-      <Footer />
-    </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
