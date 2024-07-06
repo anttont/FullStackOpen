@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useState } from 'react'
 
 import {
@@ -5,19 +6,6 @@ import {
   Routes, Route, Link, useMatch, useNavigate
 } from 'react-router-dom';
 import { useAnecdoteManager, useField } from './hooks';
-
-const Menu = () => {
-  const padding = {
-    paddingRight: 5
-  };
-  return (
-    <div>
-      <Link to='/anecdotes' style={padding}>anecdotes</Link>
-      <Link to='/createnew' style={padding}>create new</Link>
-      <Link to='/about' style={padding}>about</Link>
-    </div>
-  );
-};
 
 export const Notification = ({ message }) => {
   if (message === null) {
@@ -50,7 +38,6 @@ const AnecdoteList = ({ anecdotes }) => (
     </ul>
   </div>
 );
-
 
 const Anecdote = ({ anecdote }) => {
   return (
@@ -111,9 +98,9 @@ const CreateNew = ({ addNew }) => {
     info.reset()
   }
 
-  const { reset: resetContent, ...contentProps } = content;
-  const { reset: resetAuthor, ...authorProps } = author;
-  const { reset: resetInfo, ...infoProps } = info;
+  const { reset: resetContent, ...contentProps } = content
+  const { reset: resetAuthor, ...authorProps } = author
+  const { reset: resetInfo, ...infoProps } = info
 
   return (
     <div>
